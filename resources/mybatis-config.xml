@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- 把mybatis产生的真实SQL语句输出到控制台 -->
+		<setting name="logImpl" value="STDOUT_LOGGING"/>
+	</settings>
+<!-- 给实体类起别名 -->
+	<typeAliases>
+		<typeAlias alias="Student" type="com.bdqn.entity.Student"/>
+		<typeAlias alias="Grade" type="com.bdqn.entity.Grade"/>
+	</typeAliases>
+	
+	<!-- <mappers>
+		<mapper resource="com/bdqn/dao/StudentDaoMapper.xml" /> 
+	</mappers> -->
+
+</configuration>

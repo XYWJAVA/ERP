@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdqn.dao.StudentDao">
+	
+	<resultMap type="Student" id="StudentMap">
+		<id property="sno" column="sno"/>
+		<result property="sname" column="sname"/>
+		<result property="spass" column="spass"/>
+		<result property="birthdate" column="birthdate"/>
+		<!-- 多对一关联映射 -->
+		<!-- <association property="grade" javaType="Grade">
+			<id property="gid" column="gid"/>
+			<result property="gname" column="gname"/>
+		</association> -->
+		
+		<association property="grade" javaType="Grade" resultMap="GradeMap">
+		</association>
+		
+		<!-- <association property="grade" javaType="Grade" 
+		column="gid" select="getGradeById">
+		</association> -->	
+		
+	</resultMap>
+	
+	<resultMap type="Grade" id="GradeMap">
+			<id property="gid" column="gid"/>
+			<result property="gname" column="gname"/>
+	</resultMap>
+	
+	<select id="getAllStudent" resultType="Student">
+		select * from t_student
+	</select>
+	
+	 <select id="getAllStudentWithGrade" resultMap="StudentMap">
+		select * from t_student s left outer join t_grade g on s.gid=g.gid
+	</select> 
+	
+<!-- 	<select id="getAllStudentWithGrade" resultMap="StudentMap">
+		select * from t_student s
+	</select>
+	
+	<select id="getGradeById" resultMap="GradeMap">
+		select * from t_grade where gid=#{gid}
+	</select> -->
+
+
+     <select id="getStudentByCount" resultType="int">
+		select count(1) from t_student
+	</select>
+	
+	 <select id="getStudentByPager" resultMap="StudentMap" parameterType="java.util.Map">
+		select * from 
+		(select s.*,g.gname from t_student s
+		 left outer join t_grade g 
+		 on s.gid=g.gid order by s.sno) s
+		limit #{pageOffset},#{pageSize}
+	</select> 
+	
+	<insert id="addStudent" parameterType="Student" 
+	useGeneratedKeys="true" keyProperty="sno">
+		
+		insert into t_student(sname,spass,birthdate,gid) 
+		values(#{sname},#{spass},#{birthdate},#{grade.gid})
+	</insert>
+	
+	<select id="getStudentById" resultMap="StudentMap" parameterType="int">
+	   select s.*,g.gname from t_student s left outer join t_grade g on s.gid=g.gid
+	   where s.sno=#{sno}
+	</select>
+	
+	<update id="updateStudent" parameterType="Student">
+	     update t_student
+	     <set>
+	     	<if test="sname!=null">
+	     		sname=#{sname},
+	     	</if>
+	     	<if test="spass!=null">
+	     		spass=#{spass},
+	     	</if>
+	     	<if test="birthdate!=null">
+	     		birthdate=#{birthdate},
+	     	</if>
+	        <if test="grade.gid!=null">
+	     		gid=#{grade.gid}
+	     	</if>
+	     </set>
+		where sno=#{sno}
+	</update>
+	
+	<delete id="deleteStudent" parameterType="int">
+	  delete from  t_student where sno=#{sno}
+	</delete>
+	
+	
+	<!-- 条条件分页查询 -->
+	
+	 <select id="getStudentByCount2" resultType="int" parameterType="Student">
+		select count(1) from t_student
+		<where>
+		    <if test="sname!=null">
+	     		sname like '%${sname}%'
+	     	</if>
+		</where>
+	</select>
+	
+	 <select id="getStudentByPager2" resultMap="StudentMap" parameterType="java.util.Map">
+		select * from 
+		(select s.*,g.gname from t_student s left outer join t_grade g on s.gid=g.gid
+		  
+		  <where>
+		    <if test="student.sname!=null">
+	     		s.sname like '%${student.sname}%'
+	     	</if>
+		  </where>
+		
+		 order by s.sno) s
+		limit #{pageOffset},#{pageSize}
+	</select> 
+	
+	
+
+</mapper>
